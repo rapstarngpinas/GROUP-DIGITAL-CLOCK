@@ -4,72 +4,141 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Clock</title>
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
-    body {
-        font-family: 'Roboto Mono', monospace;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        transition: background 0.3s, color 0.3s;
-    }
-    .clock-container {
-        text-align: center;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-    .time {
-        font-size: 60px;
-        margin-bottom: 10px;
-    }
-    .date, .location {
-        font-size: 20px;
-        margin-bottom: 5px;
-    }
-    .controls {
-        margin-top: 15px;
-    }
-    select {
-        padding: 5px 10px;
-        margin: 0 5px;
-        font-size: 16px;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
-    /* Light Theme */
-    body.light {
-        background: #f0f0f0;
-        color: #222;
-    }
-    body.light .clock-container {
-        background: #fff;
-    }
+/* ============================================
+   GLOBAL BACKGROUND — GEOMETRIC PANELS + LIGHT
+   ============================================ */
 
-    /* Dark Theme */
-    body.dark {
-        background: #121212;
-        color: #eee;
-    }
-    body.dark .clock-container {
-        background: #1e1e1e;
-    }
+body {
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: background 0.5s, color 0.5s;
+    position: relative;
+}
+
+/* Layered geometric panels */
+.bg-panel {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(0,0,0,0.08));
+    clip-path: polygon(0 0, 100% 0, 100% 65%, 0 85%);
+}
+
+.bg-panel2 {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(315deg, rgba(255,255,255,0.05), rgba(0,0,0,0.05));
+    clip-path: polygon(0 40%, 100% 20%, 100% 100%, 0 100%);
+}
+
+/* Soft moving spotlight effect */
+.light-spot {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
+    border-radius: 50%;
+    top: -10%;
+    left: -10%;
+    animation: moveLight 18s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes moveLight {
+    0%   { transform: translate(0,0); }
+    50%  { transform: translate(40%, 30%); }
+    100% { transform: translate(20%, 60%); }
+}
+
+/* ============================================
+           CLOCK CONTAINER (Glass Card)
+   ============================================ */
+.clock-container {
+    position: relative;
+    text-align: center;
+    padding: 35px 50px;
+    border-radius: 18px;
+    backdrop-filter: blur(14px) saturate(180%);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0px 10px 35px rgba(0,0,0,0.4);
+    color: inherit;
+    z-index: 10;
+}
+
+.time {
+    font-size: 65px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.date, .location {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.controls {
+    margin-top: 15px;
+}
+select {
+    padding: 6px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: inherit;
+    margin: 0 8px;
+}
+
+/* ============================================
+                      THEMES
+   ============================================ */
+
+body.light {
+    background: #f2f2f3;
+    color: #1a1a1a;
+}
+body.light .clock-container {
+    background: rgba(255,255,255,0.45);
+}
+
+body.dark {
+    background: #0d1117;
+    color: #f1f1f1;
+}
+body.dark .clock-container {
+    background: rgba(0,0,0,0.45);
+}
+
 </style>
 </head>
+
 <body class="light">
+
+<!-- Geometric Background -->
+<div class="bg-panel"></div>
+<div class="bg-panel2"></div>
+<div class="light-spot"></div>
 
 <div class="clock-container">
     <div class="location">Location: <span id="location">Rodriguez, Rizal</span></div>
     <div class="time" id="time">00:00:00</div>
     <div class="date" id="date">January 1, 1970</div>
+
     <div class="controls">
-        <label for="format">Format:</label>
+        <label>Format:</label>
         <select id="format">
             <option value="12">12-hour</option>
             <option value="24">24-hour</option>
         </select>
-        <label for="theme">Theme:</label>
+
+        <label>Theme:</label>
         <select id="theme">
             <option value="light">Light</option>
             <option value="dark">Dark</option>
@@ -78,34 +147,32 @@
 </div>
 
 <script>
-const timeEl = document.getElementById('time');
-const dateEl = document.getElementById('date');
-const formatEl = document.getElementById('format');
-const themeEl = document.getElementById('theme');
+const timeEl = document.getElementById("time");
+const dateEl = document.getElementById("date");
+const formatEl = document.getElementById("format");
+const themeEl = document.getElementById("theme");
 const body = document.body;
 
 function updateClock() {
     const now = new Date();
-    
     let hours = now.getHours();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    
-    let ampm = '';
-    if(formatEl.value === '12') {
-        ampm = hours >= 12 ? ' PM' : ' AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // 0 => 12
+
+    let ampm = "";
+    if (formatEl.value === "12") {
+        ampm = hours >= 12 ? " PM" : " AM";
+        hours = hours % 12 || 12;
     }
 
-    timeEl.textContent = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}${ampm}`;
+    timeEl.textContent =
+        `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}${ampm}`;
 
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateEl.textContent = now.toLocaleDateString('en-PH', options);
+    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    dateEl.textContent = now.toLocaleDateString("en-PH", options);
 }
 
-formatEl.addEventListener('change', updateClock);
-themeEl.addEventListener('change', () => {
+themeEl.addEventListener("change", () => {
     body.className = themeEl.value;
 });
 
