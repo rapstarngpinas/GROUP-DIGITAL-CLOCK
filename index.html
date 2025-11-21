@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Clock</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+    body {
+        font-family: 'Roboto Mono', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        transition: background 0.3s, color 0.3s;
+    }
+    .clock-container {
+        text-align: center;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .time {
+        font-size: 60px;
+        margin-bottom: 10px;
+    }
+    .date, .location {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+    .controls {
+        margin-top: 15px;
+    }
+    select {
+        padding: 5px 10px;
+        margin: 0 5px;
+        font-size: 16px;
+    }
 
+    /* Light Theme */
+    body.light {
+        background: #f0f0f0;
+        color: #222;
+    }
+    body.light .clock-container {
+        background: #fff;
+    }
+
+    /* Dark Theme */
+    body.dark {
+        background: #121212;
+        color: #eee;
+    }
+    body.dark .clock-container {
+        background: #1e1e1e;
+    }
+</style>
+</head>
+<body class="light">
+
+<div class="clock-container">
+    <div class="location">Location: <span id="location">Rodriguez, Rizal</span></div>
+    <div class="time" id="time">00:00:00</div>
+    <div class="date" id="date">January 1, 1970</div>
+    <div class="controls">
+        <label for="format">Format:</label>
+        <select id="format">
+            <option value="12">12-hour</option>
+            <option value="24">24-hour</option>
+        </select>
+        <label for="theme">Theme:</label>
+        <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+    </div>
+</div>
+
+<script>
+const timeEl = document.getElementById('time');
+const dateEl = document.getElementById('date');
+const formatEl = document.getElementById('format');
+const themeEl = document.getElementById('theme');
+const body = document.body;
+
+function updateClock() {
+    const now = new Date();
+    
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    
+    let ampm = '';
+    if(formatEl.value === '12') {
+        ampm = hours >= 12 ? ' PM' : ' AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 => 12
+    }
+
+    timeEl.textContent = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}${ampm}`;
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    dateEl.textContent = now.toLocaleDateString('en-PH', options);
+}
+
+formatEl.addEventListener('change', updateClock);
+themeEl.addEventListener('change', () => {
+    body.className = themeEl.value;
+});
+
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
