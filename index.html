@@ -6,128 +6,109 @@
 <title>Digital Clock</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto+Mono:wght@400;700&display=swap');
 
-/* ============================================
-   GLOBAL BACKGROUND — GEOMETRIC PANELS + LIGHT
-   ============================================ */
-
+/* ===========================
+   GLOBAL CARTOON BACKGROUND
+   =========================== */
 body {
     font-family: 'Roboto Mono', monospace;
-    margin: 0;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    transition: background 0.5s, color 0.5s;
-    position: relative;
+    height: 100vh;
+    margin: 0;
+    transition: background 0.4s, color 0.4s;
 }
 
-/* Layered geometric panels */
-.bg-panel {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(0,0,0,0.08));
-    clip-path: polygon(0 0, 100% 0, 100% 65%, 0 85%);
+/* Cartoon-style clouds background */
+body.light {
+    background: linear-gradient(#87cefa, #f0faff);
+    background-size: cover;
+}
+body.dark {
+    background: linear-gradient(#1a1a2e, #16213e);
 }
 
-.bg-panel2 {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(315deg, rgba(255,255,255,0.05), rgba(0,0,0,0.05));
-    clip-path: polygon(0 40%, 100% 20%, 100% 100%, 0 100%);
-}
-
-/* Soft moving spotlight effect */
-.light-spot {
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
-    border-radius: 50%;
-    top: -10%;
-    left: -10%;
-    animation: moveLight 18s infinite alternate ease-in-out;
-    pointer-events: none;
-}
-
-@keyframes moveLight {
-    0%   { transform: translate(0,0); }
-    50%  { transform: translate(40%, 30%); }
-    100% { transform: translate(20%, 60%); }
-}
-
-/* ============================================
-           CLOCK CONTAINER (Glass Card)
-   ============================================ */
+/* =====================
+   CLOCK CONTAINER STYLE
+   ===================== */
 .clock-container {
-    position: relative;
     text-align: center;
-    padding: 35px 50px;
-    border-radius: 18px;
-    backdrop-filter: blur(14px) saturate(180%);
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0px 10px 35px rgba(0,0,0,0.4);
-    color: inherit;
-    z-index: 10;
+    padding: 35px;
+    border-radius: 25px;
+    background: #fff;
+    border: 5px solid #000;
+    box-shadow: 6px 6px 0px #000;
+    transition: 0.3s;
+}
+
+body.dark .clock-container {
+    background: #222;
+    color: #eee;
+    border-color: #fff;
+    box-shadow: 6px 6px 0px #fff;
+}
+
+/* =====================
+   TEXT STYLE
+   ===================== */
+.location {
+    font-family: "Fredoka One", sans-serif;
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
 .time {
-    font-size: 65px;
-    font-weight: 700;
+    font-family: "Fredoka One", sans-serif;
+    font-size: 70px;
     margin-bottom: 10px;
-}
-.date, .location {
-    font-size: 20px;
-    margin-bottom: 8px;
+    color: #ff4b4b;
+    text-shadow: 3px 3px 0px #000;
 }
 
+.date {
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+
+/* =====================
+   SELECT CONTROLS STYLE
+   ===================== */
 .controls {
     margin-top: 15px;
 }
+
 select {
-    padding: 6px 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 3px solid #000;
     font-size: 16px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: inherit;
-    margin: 0 8px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #ffe680;
+    box-shadow: 3px 3px 0px #000;
+    transition: 0.3s;
 }
 
-/* ============================================
-                      THEMES
-   ============================================ */
-
-body.light {
-    background: #f2f2f3;
-    color: #1a1a1a;
-}
-body.light .clock-container {
-    background: rgba(255,255,255,0.45);
+select:active {
+    transform: translate(2px,2px);
+    box-shadow: 1px 1px 0px #000;
 }
 
-body.dark {
-    background: #0d1117;
-    color: #f1f1f1;
+body.dark select {
+    background: #444;
+    color: #fff;
+    border-color: #fff;
+    box-shadow: 3px 3px 0px #fff;
 }
-body.dark .clock-container {
-    background: rgba(0,0,0,0.45);
-}
-
 </style>
 </head>
 
 <body class="light">
 
-<!-- Geometric Background -->
-<div class="bg-panel"></div>
-<div class="bg-panel2"></div>
-<div class="light-spot"></div>
-
 <div class="clock-container">
-    <div class="location">Location: <span id="location">Rodriguez, Rizal</span></div>
+    <div class="location">📍 Location: <span id="location">Rodriguez, Rizal</span></div>
     <div class="time" id="time">00:00:00</div>
     <div class="date" id="date">January 1, 1970</div>
 
@@ -147,34 +128,38 @@ body.dark .clock-container {
 </div>
 
 <script>
-const timeEl = document.getElementById("time");
-const dateEl = document.getElementById("date");
-const formatEl = document.getElementById("format");
-const themeEl = document.getElementById("theme");
+const timeEl = document.getElementById('time');
+const dateEl = document.getElementById('date');
+const formatEl = document.getElementById('format');
+const themeEl = document.getElementById('theme');
 const body = document.body;
 
 function updateClock() {
     const now = new Date();
+
     let hours = now.getHours();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
 
-    let ampm = "";
-    if (formatEl.value === "12") {
-        ampm = hours >= 12 ? " PM" : " AM";
-        hours = hours % 12 || 12;
+    let ampm = '';
+    if (formatEl.value === '12') {
+        ampm = hours >= 12 ? ' PM' : ' AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
     }
 
     timeEl.textContent =
         `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}${ampm}`;
 
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    dateEl.textContent = now.toLocaleDateString("en-PH", options);
+    const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+    dateEl.textContent = now.toLocaleDateString('en-PH', options);
 }
 
-themeEl.addEventListener("change", () => {
+themeEl.addEventListener('change', () => {
     body.className = themeEl.value;
 });
+
+formatEl.addEventListener('change', updateClock);
 
 setInterval(updateClock, 1000);
 updateClock();
